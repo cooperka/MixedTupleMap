@@ -29,19 +29,25 @@ MixedTupleMap.prototype = {
     var prim = [];
     var primOrder = [];
     var nonPrimOrder = [];
+    var hasNonPrim = false;
 
     for (var i = 0; i < l; i++) {
       var arg = tuple[i];
       var argType = typeof arg === 'undefined' ? 'undefined' : _typeof(arg);
-      if (argType !== null && (argType === 'object' || argType === 'function')) {
+      if (arg && typeof arg.hash === 'function') {
+        prim.push(arg.hash());
+        primOrder.push(i);
+        hasNonPrim = true;
+      } else if (argType !== null && (argType === 'object' || argType === 'function')) {
         nonPrimOrder.push(i);
+        hasNonPrim = true;
       } else {
         prim.push(argType === 'string' ? '"' + arg + '"' : '' + arg);
         primOrder.push(i);
       }
     }
 
-    if (nonPrimOrder.length === 0) {
+    if (!hasNonPrim) {
       throw new Error('Tuple must have at least one non-primitive part');
     }
 
